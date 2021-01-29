@@ -13,7 +13,7 @@ import sys
 # Libs
 import numpy
 import pandas
-from scipy import stats
+from scipy import stats, spatial
 import matplotlib.pyplot
 
 
@@ -53,7 +53,26 @@ def createKPoints(k,bounds):
             dimensions.append(numpy.random.uniform(bounds[y][0], bounds[y][1]))
         dict_of_points.update({ x : dimensions })
 
-    return dict_of_points
+    centers = pandas.DataFrame(data=dict_of_points)
+
+    return centers
+
+
+def findNearestCenter(df,centers,index):
+    k = len(centers.columns)
+    df = df.drop(['Name'],axis=1)
+
+    min_dist = numpy.finfo(numpy.float64).max
+    nearest = -1
+
+    for x in range(k):
+        dist = spatial.distance.euclidean(df.loc[index].astype('float64'), centers[x])
+        if dist < min_dist:
+            nearest = x
+            min_dist = dist
+
+    return nearest
+
 
 
 if __name__ == '__main__':
@@ -63,7 +82,9 @@ if __name__ == '__main__':
     cell_dataframe = createCombinedDataFrame();
     bounds = calculateSpaceBounds(cell_dataframe)
 
-    #dict_of_points = createKPoints(3,bounds)
-    #print(dict_of_points)
+    centers = createKPoints(20,bounds)
+    #print(centers)
+
+    print(findNearestCenter(cell_dataframe,centers,15))
 
     print("FINISHED")
