@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+"""
+Michael Ventoso
+MichaelVentoso@Gmail.com
+
+ProtAtOnce Interview Phase 3
+Part B: Cell Dataset
+"""
+# Built-in
+import os
+import sys
+
+# Libs
+import numpy
+import pandas
+from scipy import stats
+import matplotlib.pyplot
+
+
+def createCombinedDataFrame():
+
+    #creates dataframe for first .csv file and sets column names
+    cell_dataset = pandas.read_csv(os.path.join(sys.path[0], 'cell_dataset.csv'))
+
+    cell_dataframe = pandas.DataFrame(cell_dataset,
+                                       columns=['Name', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5',
+                                                'x_6', 'x_7', 'x_8', 'x_9', 'x_10',
+                                                'x_11', 'x_12', 'x_13', 'x_14', 'x_15',
+                                                'x_16', 'x_17', 'x_18', 'x_19', 'x_20'])
+
+    return cell_dataframe
+
+
+def calculateSpaceBounds(df):
+
+    df = df.drop(['Name'], axis=1)
+
+    bounds = []
+
+    for label, content in df.iteritems():
+        bounds.append([content.min(), content.max()])
+
+    return bounds
+
+
+def createKPoints(k,bounds):
+
+    dict_of_points = {}
+
+    for x in range(k):
+        dimensions = []
+        for y in range(20):
+            dimensions.append(numpy.random.uniform(bounds[y][0], bounds[y][1]))
+        dict_of_points.update({ x : dimensions })
+
+    return dict_of_points
+
+
+if __name__ == '__main__':
+    print("STARTED")
+    print()
+
+    cell_dataframe = createCombinedDataFrame();
+    bounds = calculateSpaceBounds(cell_dataframe)
+
+    #dict_of_points = createKPoints(3,bounds)
+    #print(dict_of_points)
+
+    print("FINISHED")
