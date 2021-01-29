@@ -54,7 +54,6 @@ def createKPoints(k,bounds):
         dict_of_points.update({ x : dimensions })
 
     centers = pandas.DataFrame(data=dict_of_points)
-
     return centers
 
 
@@ -62,7 +61,7 @@ def findNearestCenter(df,centers,index):
     k = len(centers.columns)
     df = df.drop(['Name'],axis=1)
 
-    min_dist = numpy.finfo(numpy.float64).max
+    min_dist = 1000000.0
     nearest = -1
 
     for x in range(k):
@@ -75,28 +74,28 @@ def findNearestCenter(df,centers,index):
 
 
 def calculateCenters(df, set_list, k,):
+    n = len(set_list)
     dict_of_points = {}
+    df_dropped = df.drop(['Name'], axis=1)
 
-    for x in set_list:
-        running_total = []
+    for x in range(n):
+        running_total = {}
         dimensions = []
-        for y in x:
-            for q in range(10):
-                running_total.append([0])
-            for z in range(20):
-                running_total[y][z] += df.loc[z].astype('float64')
-        for q in range(20):
-            dimensions.append(sum(running_total[y]) / 20)
+        len_list = len(set_list[x])
+        for y in range(len_list):
+            for z in df_dropped.columns:
+                if z not in running_total:
+                    running_total.update({z: df_dropped.loc[y, z].astype('float64')})
+                else:
+                    running_total.update({z: running_total.get(z) + df_dropped.loc[y, z].astype('float64')})
+        for q in df_dropped.columns:
+            dimensions.append(running_total[q]/len_list)
         dict_of_points.update({x: dimensions})
     centers = pandas.DataFrame(data=dict_of_points)
-    print(centers)
     return centers
 
 
-    return 5
-
-
-def kMeans(df,k,centers=None):
+def kMeans(df,k,iterations,centers=None):
 
     bounds = calculateSpaceBounds(df)
 
@@ -105,16 +104,19 @@ def kMeans(df,k,centers=None):
 
     num_points = len(df)
 
-    set_list = [set() for s in range(k)]
+    set_list = []
 
-    for i in range(3):
+    for i in range(iterations):
         print(i)
+        set_list = [set() for s in range(k)]
         for x in range(num_points):
             nearest = findNearestCenter(df,centers,x)
             set_list[nearest].add(x)
         centers = calculateCenters(df, set_list, k)
 
-    print(set_list)
+    df_return = pandas.DataFrame(list(set_list))
+    df_return = df_return.transpose()
+    df_return.to_csv('kMeans_k_' + str(k) + '.csv')
 
 
 if __name__ == '__main__':
@@ -123,13 +125,6 @@ if __name__ == '__main__':
 
     cell_dataframe = createCombinedDataFrame();
 
-    kMeans(cell_dataframe,3)
+    kMeans(cell_dataframe,5,50)
 
-    """bounds = calculateSpaceBounds(cell_dataframe)
-
-    centers = createKPoints(20,bounds)
-    print(centers)
-
-    print(findNearestCenter(cell_dataframe,centers,15))
-    """
     print("FINISHED")
