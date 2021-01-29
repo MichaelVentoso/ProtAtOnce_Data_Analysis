@@ -1,10 +1,12 @@
-# Michael Ventoso
-# MichaelVentoso@Gmail.com
-# 732.697.5992
-#
-# ProtAtOnce Phase 3
-# Part A: NBA Dataset
-# Dealing with Age
+# -*- coding: utf-8 -*-
+"""
+Michael Ventoso
+MichaelVentoso@Gmail.com
+
+ProtAtOnce Phase 3
+Part A: NBA Dataset
+Dealing with Age
+"""
 
 import numpy
 import pandas
