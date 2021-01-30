@@ -76,26 +76,32 @@ def findNearestCenter(df,centers,index):
 def calculateCenters(df, set_list, k,):
     n = len(set_list)
     dict_of_points = {}
-    df_dropped = df.drop(['Name'], axis=1)
+    df = df.drop(['Name'], axis=1)
 
     for x in range(n):
         running_total = {}
         dimensions = []
         len_list = len(set_list[x])
         for y in range(len_list):
-            for z in df_dropped.columns:
+            for z in df.columns:
                 if z not in running_total:
-                    running_total.update({z: df_dropped.loc[y, z].astype('float64')})
+                    running_total.update({z: df.loc[y, z].astype('float64')})
                 else:
-                    running_total.update({z: running_total.get(z) + df_dropped.loc[y, z].astype('float64')})
-        for q in df_dropped.columns:
-            dimensions.append(running_total[q]/len_list)
+                    running_total.update({z: running_total.get(z) + df.loc[y, z].astype('float64')})
+        for q in df.columns:
+            if running_total.get(q) is None:
+                running_total.update({q:0})
+
+            if len_list == 0:
+                dimensions.append(0)
+            else:
+                dimensions.append(running_total.get(q)/len_list)
         dict_of_points.update({x: dimensions})
     centers = pandas.DataFrame(data=dict_of_points)
     return centers
 
 
-def kMeans(df,k,iterations,centers=None):
+def kMeans(df,k,num,iterations,centers=None):
 
     bounds = calculateSpaceBounds(df)
 
@@ -116,7 +122,7 @@ def kMeans(df,k,iterations,centers=None):
 
     df_return = pandas.DataFrame(list(set_list))
     df_return = df_return.transpose()
-    df_return.to_csv('kMeans_k_' + str(k) + '.csv')
+    df_return.to_csv('kMeans_k' + str(k) + '_n' + str(num) + '.csv')
 
 
 if __name__ == '__main__':
@@ -125,6 +131,8 @@ if __name__ == '__main__':
 
     cell_dataframe = createCombinedDataFrame();
 
-    kMeans(cell_dataframe,5,50)
+    for x in range(1, 6):
+        for y in range(3, 8, 1):
+            kMeans(cell_dataframe, y, x, 50)
 
     print("FINISHED")
