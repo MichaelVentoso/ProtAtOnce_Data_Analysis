@@ -59,7 +59,7 @@ def analyzeFeatures(df, k, numTrial):
 
     cluster_list = createClusterList(df, k, numTrial)
     center = calculateCenter(df, cluster_list, k)
-    cluster_features = []
+    cluster_spreads = []
 
     # for each cluster
     for cluster_id in range(k):
@@ -77,7 +77,19 @@ def analyzeFeatures(df, k, numTrial):
         for x in range(20):
             feature_spread[x] = float("{0:.2f}".format(feature_spread[x] / n))
 
-        cluster_features.append(feature_spread)
+        cluster_spreads.append(feature_spread)
+
+    cluster_features = []
+
+    for x in cluster_spreads:
+        top_features = []
+
+        for y in range(5):
+            index = x.index(min(x))
+            top_features.append(index)
+            x[index] = 100
+
+        cluster_features.append(top_features)
 
     return cluster_features
 
