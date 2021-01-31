@@ -57,9 +57,9 @@ def createKPoints(k,bounds):
     return centers
 
 
-def findNearestCenter(df,centers,index):
+def findNearestCenter(df, centers, index):
     k = len(centers.columns)
-    df = df.drop(['Name'],axis=1)
+    df = df.drop(['Name'], axis=1)
 
     min_dist = 1000000.0
     nearest = -1

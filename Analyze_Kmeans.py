@@ -55,7 +55,6 @@ def createClusterList(df, k, num_trial):
 def calculateCenter(df, set_list, k):
     n = len(set_list)
     dict_of_points = {}
-    df = df.drop(['Name'], axis=1)
 
     for x in range(n):
         running_total = {}
@@ -81,13 +80,51 @@ def calculateCenter(df, set_list, k):
 
 
 def calculateAverageSpread(df, k, numTrials):
-    total_spread = 0
+    df = df.drop(['Name'], axis=1)
+    spread_list = []
 
-    for i in range(numTrials):
-        cluster_list = createClusterList(df, k, i)
+    #for each trial
+    for trial_id in range(numTrials):
+        trial_list = []
+        cluster_list = createClusterList(df, k, trial_id)
         centers = calculateCenter(df, cluster_list, k)
 
-        
+        #for each cluster
+        for cluster_id in range(k):
+            n = len(cluster_list[cluster_id])
+            cluster_spread = 0
+
+            #for each point in each cluster
+            for cell_id in cluster_list[cluster_id]:
+                cell_spread = 0
+
+                #for each feature of each cell
+                for x in range(20):
+                    cell_spread += spatial.distance.euclidean(df.loc[cell_id].astype('float64'), centers[cluster_id])
+
+                cluster_spread += cell_spread
+
+            trial_list.append(cluster_spread/n)
+
+        spread_list.append(trial_list)
+
+    cluster_total_spread = {}
+
+    for y in range(numTrials):
+        for z in range(k):
+            if z in cluster_total_spread:
+                #previous = cluster_total_spread.get(z)
+                cluster_total_spread.update({z: cluster_total_spread.get(z) + spread_list[y][z]})
+            else:
+                cluster_total_spread.update({z: spread_list[y][z]})
+
+    for q in range(k):
+        cluster_total_spread.update({q: cluster_total_spread.get(q)/numTrials})
+
+    return cluster_total_spread
+
+
+
 
 
 if __name__ == '__main__':
