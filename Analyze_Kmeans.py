@@ -108,20 +108,26 @@ def calculateAverageSpread(df, k, numTrials):
 
         spread_list.append(trial_list)
 
-    cluster_total_spread = {}
+    total_spread = 0
+    for x in spread_list:
+        for y in x:
+            total_spread += y
+    return total_spread/ (numTrials * k)
 
-    for y in range(numTrials):
-        for z in range(k):
-            if z in cluster_total_spread:
-                #previous = cluster_total_spread.get(z)
-                cluster_total_spread.update({z: cluster_total_spread.get(z) + spread_list[y][z]})
-            else:
-                cluster_total_spread.update({z: spread_list[y][z]})
-
-    for q in range(k):
-        cluster_total_spread.update({q: cluster_total_spread.get(q)/numTrials})
-
-    return cluster_total_spread
+    # cluster_total_spread = {}
+    #
+    # for y in range(numTrials):
+    #     for z in range(k):
+    #         if z in cluster_total_spread:
+    #             #previous = cluster_total_spread.get(z)
+    #             cluster_total_spread.update({z: cluster_total_spread.get(z) + spread_list[y][z]})
+    #         else:
+    #             cluster_total_spread.update({z: spread_list[y][z]})
+    #
+    # for q in range(k):
+    #     cluster_total_spread.update({q: cluster_total_spread.get(q)/numTrials})
+    #
+    # return cluster_total_spread
 
 
 
@@ -132,7 +138,7 @@ if __name__ == '__main__':
     print()
 
     df = createCellDataFrame()
-    calculateAverageSpread(df, 3, 5)
+    print(calculateAverageSpread(df, 3, 5))
 
 
     print("FINISHED")
